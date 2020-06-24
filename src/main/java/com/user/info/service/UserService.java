@@ -3,6 +3,7 @@ package com.user.info.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
@@ -21,9 +22,15 @@ import net.sf.geographiclib.GeodesicMask;
 @Service
 public class UserService {
 
-	private UserServiceProxy userServiceProxy;
+	@Value("${city.latitude}")
+	double cityLatitude;
+    
+	@Value("${city.longitude}") 
+	double cityLongitude;
 
-	private MessageSource messageSource;
+    private UserServiceProxy userServiceProxy;
+	
+    private MessageSource messageSource;
 	
 	public UserService(UserServiceProxy userServiceProxy,MessageSource messageSource) {
 		this.userServiceProxy = userServiceProxy;
@@ -60,10 +67,9 @@ public class UserService {
 	}
 	
 
-
 	public List<UserDTO> filterByDistance(List<UserDTO> users, float distance, String unit) {
 			List<UserDTO> result = users.parallelStream().filter(user -> {
-			double calDistance =	ServiceUtil.distance( user.getLatitude(),
+			double calDistance =	ServiceUtil.distance(cityLatitude, cityLongitude, user.getLatitude(),
 						user.getLongitude(),unit);
 			if (calDistance <= distance)
 				return true;

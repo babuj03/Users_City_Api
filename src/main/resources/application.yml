@@ -3,10 +3,6 @@ server:
 spring:
     profiles:
         active: default
-    security:
-        user:
-          name: test
-          password: password
 city:
   latitude: 51.507351
   longitude: -0.127758
@@ -14,10 +10,11 @@ city:
 logging:
   level:
     root: INFO
-    
+ 
+app:
+   name: UserCityServiceClient   
+   
 bpdts:
   test:
     app: bpdts-test-app.herokuapp.com
-    
-  
-        
+ 

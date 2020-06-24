@@ -1,6 +1,7 @@
 package com.user.info.util;
 
 
+
 import net.sf.geographiclib.Geodesic;
 import net.sf.geographiclib.GeodesicData;
 import net.sf.geographiclib.GeodesicMask;
@@ -9,11 +10,10 @@ public class ServiceUtil {
 
 	public static String SPRING_PROFILE_DEVELOPMENT = "dev";
     public static String DEFAULT_DISTANCE_UNIT =  "MILE";
-    public static double LONDON_LATITUDE = 51.508530d;
-    public static double LONDON_LONGTITUDE = -0.07613d;
+    
 	
-	public static double distance(double userLat, double userLon, String unit) {
-		GeodesicData g = Geodesic.WGS84.Inverse(ServiceUtil.LONDON_LATITUDE, ServiceUtil.LONDON_LONGTITUDE, userLat,
+	public static double distance(double cityLatitude, double cityLongtitude, double userLat, double userLon, String unit) {
+		GeodesicData g = Geodesic.WGS84.Inverse(cityLatitude, cityLongtitude, userLat,
 				userLon,
                 GeodesicMask.DISTANCE);
 		

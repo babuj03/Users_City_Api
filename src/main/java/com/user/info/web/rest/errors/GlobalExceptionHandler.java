@@ -2,13 +2,10 @@ package com.user.info.web.rest.errors;
 
 
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
