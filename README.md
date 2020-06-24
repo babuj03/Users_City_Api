@@ -4,8 +4,10 @@ Consume User Rest api using Spring cloud Feign.
 
 
 
-Filter the user result by city and given distance.
+Filter the user result by city(London) and given distance.
 
+Latidue and Longitude for London are listed as 51.509865, -0.118092 respectively. 
+Distance calculations are done using the GeographicLib.
 
 Api need basic authorization - use below user/password in request header
 
