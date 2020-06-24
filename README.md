@@ -25,3 +25,9 @@ http://localhost:8080/api/v1/users/1
 http://localhost:8080/api/v1/city/london/users
 
 http://localhost:8080/api/v1/city/london/users?miles=5000
+
+http://localhost:8080/api/v1/city/london/users?distance=50&units=km
+
+http://localhost:8080/api/v1/city/london/users?distance=50&units=mile
+
+http://localhost:8080/api/v1/city/london/users?distance=50&units=meter
