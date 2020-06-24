@@ -118,7 +118,7 @@ public class UserTest {
 	}
 
 	@Test
-	public void getUsersInCityWithIn_50_MILE_DEFAULT_UNITS() throws Exception {
+	public void getUsersInCityWithIn_50_Mile_Default_units() throws Exception {
 		when(userService.getUserByCity("London")).thenReturn(dtoList);
 		mockmvc.perform(get(createURLWithPort("/city/London/users?distance=50"))
 				.header(HttpHeaders.AUTHORIZATION, getAuthHeader()).accept(MediaType.APPLICATION_JSON)).andDo(print())

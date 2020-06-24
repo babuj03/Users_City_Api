@@ -1,45 +1,32 @@
 package com.user.info.util;
 
 
+import net.sf.geographiclib.Geodesic;
+import net.sf.geographiclib.GeodesicData;
+import net.sf.geographiclib.GeodesicMask;
+
 public class ServiceUtil {
 
 	public static String SPRING_PROFILE_DEVELOPMENT = "dev";
     public static String DEFAULT_DISTANCE_UNIT =  "MILE";
-    public static float LONDON_LATITUDE = 51.508530f;
-    public static float LONDON_LONGTITUDE = -0.076132f;
+    public static double LONDON_LATITUDE = 51.508530d;
+    public static double LONDON_LONGTITUDE = -0.07613d;
 	
-	public static double distance(double lat1, double lon1, double lat2, double lon2, String unit) {
-		  double theta = lon1 - lon2;
-		  double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
-		  dist = Math.acos(dist);
-		  dist = rad2deg(dist);
-		  dist = dist * 60 * 1.1515;
-		  if (unit.equalsIgnoreCase("Km") || unit.equalsIgnoreCase("Kilometer")) {
-			  dist = dist * 1.609344;
-		  }else if (unit.equalsIgnoreCase("Meter")) {
-			  dist = (dist  * 1.609344) * 1000;
-		  }else {
-			  dist = dist * 0.8684; // default by mile;
-		    }
-		  return dist;
+	public static double distance(double userLat, double userLon, String unit) {
+		GeodesicData g = Geodesic.WGS84.Inverse(ServiceUtil.LONDON_LATITUDE, ServiceUtil.LONDON_LONGTITUDE, userLat,
+				userLon,
+                GeodesicMask.DISTANCE);
 		
-		/*lat1 = Math.toRadians(lat1);
-        lon1 = Math.toRadians(lon1);
-        lat2 = Math.toRadians(lat2);
-        lon2 = Math.toRadians(lon2);
-
-        double earthRadius = 6371.01; //Kilometers
-        return earthRadius * Math.acos(Math.sin(lat1)*Math.sin(lat2) + Math.cos(lat1)*Math.cos(lat2)*Math.cos(lon1 - lon2));
-	*/
+		if(unit.equalsIgnoreCase("km") || unit.equalsIgnoreCase("kilometer"))
+		  return g.s12/1000;
+		
+		if(unit.equalsIgnoreCase("meter"))
+			 return g.s12;
+		
+		//Default convert into Mile
+		 return g.s12/1609;
 	}
 	
-      private static double deg2rad(double deg) {
-	  return (deg * Math.PI / 180.0);
-      }
-	
-     private static  double rad2deg(double rad) {
-	  return (rad * 180.0 / Math.PI);
-      }
 	
     public static boolean isStringOnlyAlphabet(String str) 
     { 

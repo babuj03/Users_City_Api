@@ -42,7 +42,7 @@ public class UserResource {
      * @throws UserNotFoundException the resource not found exception
      */
     @GetMapping("/users/{id}")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable(name="id") String id) {
+    public ResponseEntity<UserDTO> getUserById(@PathVariable(name="id",required = true ) String id) {
     	UserDTO user = userService.getUserById(id);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
@@ -57,7 +57,7 @@ public class UserResource {
     public ResponseEntity<List<UserDTO>> getUserByCity(@PathVariable(name="city", required = true ) String city, @RequestParam(name="distance", required = false) Float distance, @RequestParam(name="units", required = false, defaultValue = "mile") String units) {
     	 List<UserDTO> users = userService.getUserByCity(city);
     	 //Filter users by distance
-    	 if(distance != null) {
+    	 if(distance != null && distance > 0.0f) {
     		 users= userService.filterByDistance(users,distance, units);
     	 }
     		 

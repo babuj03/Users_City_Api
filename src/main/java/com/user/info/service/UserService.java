@@ -14,6 +14,9 @@ import com.user.info.web.rest.errors.InvalidCityException;
 import com.user.info.web.rest.errors.UserNotFoundException;
 
 import feign.FeignException;
+import net.sf.geographiclib.Geodesic;
+import net.sf.geographiclib.GeodesicData;
+import net.sf.geographiclib.GeodesicMask;
 
 @Service
 public class UserService {
