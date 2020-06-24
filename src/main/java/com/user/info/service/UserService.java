@@ -59,10 +59,10 @@ public class UserService {
 
 
 	public List<UserDTO> filterByDistance(List<UserDTO> users, float distance, String unit) {
-
-		List<UserDTO> result = users.parallelStream().filter(user -> {
-			if (ServiceUtil.distance(ServiceUtil.LONDON_LATITUDE, ServiceUtil.LONDON_LONGTITUDE, user.getLatitude(),
-					user.getLongitude(),unit) <= distance)
+			List<UserDTO> result = users.parallelStream().filter(user -> {
+			double calDistance =	ServiceUtil.distance( user.getLatitude(),
+						user.getLongitude(),unit);
+			if (calDistance <= distance)
 				return true;
 			else
 				return false;
