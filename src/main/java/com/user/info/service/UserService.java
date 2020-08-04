@@ -43,14 +43,15 @@ public class UserService {
 
 	public UserDTO getUserById(String id) {
 		
-		UserDTO user=null;
+		
 		try {
-			user = userServiceProxy.getUserById(id);
-		} catch (FeignException.NotFound ex) {
+			return userServiceProxy.getUserById(id);
+		} catch (FeignException ex) {
+			if(ex.
 			throw new UserNotFoundException(
 					messageSource.getMessage("error.user.not.found", new Object[] { id }, LocaleContextHolder.getLocale()));
 		}
-		return user;
+		
 	}
 
 	public List<UserDTO> getUserByCity(String city) {
