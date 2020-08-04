@@ -30,6 +30,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	  
 	  return new ResponseEntity<ExceptionResponse>(exceptionResponse, HttpStatus.BAD_REQUEST);
   }
+  
+  
+  @ExceptionHandler(FeignException.NotFound.class)
+ 	public ResponseEntity<ExceptionResponse> handleFeignNotFoundException(FeignException ex, WebRequest request, HttpServletResponse response) {
+ 	  ExceptionResponse exceptionResponse = new ExceptionResponse(
+ 			  ex.getMessage(),
+ 			  request.getDescription(false),
+ 			  LocalDateTime.now(),
+ 			  HttpStatus.NOT_FOUND.value());
+ 	 
+ 	  
+ 	  return new ResponseEntity<ExceptionResponse>(exceptionResponse, HttpStatus.NOT_FOUND);
+   }
 
   @ExceptionHandler(UserNotFoundException.class)
   public ResponseEntity<ExceptionResponse> handleFeignUserNotFoundException(UserNotFoundException ex, WebRequest request, HttpServletResponse response) {
