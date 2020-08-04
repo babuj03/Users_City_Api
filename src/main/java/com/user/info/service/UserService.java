@@ -41,21 +41,12 @@ public class UserService {
 		return userServiceProxy.getUsers();
 	}
 
-	public UserDTO getUserById(String id) {
-		
-		
-		try {
-			return userServiceProxy.getUserById(id);
-		} catch (FeignException ex) {
-			if(ex.
-			throw new UserNotFoundException(
-					messageSource.getMessage("error.user.not.found", new Object[] { id }, LocaleContextHolder.getLocale()));
-		}
+	public UserDTO getUserById(String id) throws Exception {
+		return userServiceProxy.getUserById(id);
 		
 	}
 
 	public List<UserDTO> getUserByCity(String city) {
-		
 		
 		if(!city.isEmpty() && ServiceUtil.isStringOnlyAlphabet(city)) {
 		 return userServiceProxy.getUserByCity(ServiceUtil.capitalize(city));
