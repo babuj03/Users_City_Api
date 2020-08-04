@@ -54,16 +54,14 @@ public class UserService {
 	}
 
 	public List<UserDTO> getUserByCity(String city) {
-		List<UserDTO> users = null;
+		
 		
 		if(!city.isEmpty() && ServiceUtil.isStringOnlyAlphabet(city)) {
-		  users = userServiceProxy.getUserByCity(ServiceUtil.capitalize(city));
+		 return userServiceProxy.getUserByCity(ServiceUtil.capitalize(city));
 		}else {
 			throw new InvalidCityException(
 					messageSource.getMessage("error.invalid.city.name", new Object[] { city }, LocaleContextHolder.getLocale()));
 		}
-		
-		return users;
 	}
 	
 
@@ -71,10 +69,8 @@ public class UserService {
 			List<UserDTO> result = users.parallelStream().filter(user -> {
 			double calDistance =	ServiceUtil.distance(cityLatitude, cityLongitude, user.getLatitude(),
 						user.getLongitude(),unit);
-			if (calDistance <= distance)
-				return true;
-			else
-				return false;
+			return calDistance <= distance;
+			
 		}).collect(Collectors.toList());
 
 		return result;
