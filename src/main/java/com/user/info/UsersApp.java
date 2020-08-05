@@ -14,7 +14,6 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 
 @SpringBootApplication
 @EnableFeignClients
-@ComponentScan
 public class UsersApp {
 
     private static final Logger log = LoggerFactory.getLogger(UsersApp.class);
