@@ -1,146 +1,143 @@
 package com.users.info.test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.util.Base64Utils;
 
 import com.user.info.UsersApp;
 import com.user.info.service.UserService;
 import com.user.info.service.dto.UserDTO;
+import com.user.info.util.ServiceUtil;
 import com.user.info.web.rest.errors.InvalidCityException;
-import com.user.info.web.rest.errors.UserNotFoundException;
+
+import feign.FeignException;
 
 @SpringBootTest(classes = UsersApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @EnableConfigurationProperties
 public class UserTest {
 
-	@Autowired
-	MockMvc mockmvc;
+	@Value("${city.latitude}")
+	private double latitude;
+	
+	@Value("${city.longitude}")
+	private double longitude;
 
-	@MockBean
+	
+	@Autowired
 	UserService userService;
 
-	@LocalServerPort
-	int port;
+	private final Double DISTANCE_LIMIT =50d;
+	
 
-	@Value("${spring.security.user.name}")
-	private String username;
+    private static List<UserDTO> dtoList ;
 
-	@Value("${spring.security.user.password}")
-	private String password;
-
-	static List<UserDTO> dtoList = new ArrayList<UserDTO>();
-
-	String auth;
-
+    private String cityName = "London";
+	
 	@BeforeAll
 	public static void init() {
-		dtoList.add(UserDTO.builder().first_name("Babu").email("bab@tes.com").id(1l).build());
-		dtoList.add(UserDTO.builder().first_name("Jay").email("jay@tes.com").id(2l).build());
-	}
-
-	@Test
-	public void getAllUser() throws Exception {
-
-		mockmvc.perform(get(createURLWithPort("/users/")).header(HttpHeaders.AUTHORIZATION, getAuthHeader())
-				.accept(MediaType.APPLICATION_JSON)).andDo(print())
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
-				.andExpect(content().json("[]"));
-		verify(userService, times(1)).users();
+		dtoList = new ArrayList<UserDTO>();
+		dtoList.add(UserDTO.builder().first_name("Babu").last_name("").email("bab@tes.com").id(1l).latitude(51.507351).longitude(0.118092).build());
+		dtoList.add(UserDTO.builder().first_name("Jay").last_name("").email("jay@tes.com").id(2l).latitude(51.5033).longitude(0.1195).build());
+		dtoList.add(UserDTO.builder().first_name("Ganesh").last_name("").email("ganesh@tes.com").id(3l).latitude(53.507351).longitude(1.5491).build());
+		dtoList.add(UserDTO.builder().first_name("Tej").last_name("").email("Tej@tes.com").id(4l).latitude(54.9783).longitude(1.6178).build());
+		
 	}
 	
 	@Test
-	public void shoudReturn_401_status() throws Exception {
-		mockmvc.perform(get(createURLWithPort("/users/")).contentType(MediaType.APPLICATION_JSON)).andDo(print())
-				.andExpect(status().is4xxClientError());
+	public void city_distance_lessThan_50() {
+		double distance = ServiceUtil.distance(latitude, longitude, 51.507351d, 0.118092d, "KM");
+		assertThat("citydistanceLessThan_50", distance, lessThan(DISTANCE_LIMIT));
+	}
+	
+	@Test
+	public void city_distance_greaterThan_50() {
+	 double distance =	ServiceUtil.distance(latitude, longitude, 53.8008d, 1.5491d, "KM");
+	 assertThat("citydistanceGreaterThan_50",
+			 distance,          
+	           greaterThan(DISTANCE_LIMIT));
+	}  
+	
+	@Test
+	public  void valid_city_name() {
+	  assertEquals(true,ServiceUtil.isStringOnlyAlphabet("LONDON"));
+	}
+	
+	@Test
+	public  void invalid_city_name() {
+	  assertEquals(false,ServiceUtil.isStringOnlyAlphabet("3LOS"));
+	}
+	
+	@Test
+	public void capitalize_City_Name() {
+		assertEquals("Leeds",ServiceUtil.capitalize("LEEDS"));
+	}
+	
+	@Test
+	public void filter_city_within_50_KM() throws Exception {
+	 List<UserDTO> filteredUsers =	userService.filterByDistance(dtoList,50,"KM");
+	 assertEquals(filteredUsers.size(), 2);
+	 assertEquals(filteredUsers.get(0).getFirst_name(),"Babu");
+	}
+	
+	@Test
+	public void filter_city_within_50_Miles() throws Exception {
+	 List<UserDTO> filteredUsers =	userService.filterByDistance(dtoList,50,"Miles");
+	 assertEquals(filteredUsers.size(), 2);
+	 assertEquals(filteredUsers.get(0).getFirst_name(),"Babu");
+	}
+	
+	@Test
+	public void filter_city_within_50_Meter() throws Exception {
+	 List<UserDTO> filteredUsers =	userService.filterByDistance(dtoList,50,"Meter");
+	 assertEquals(filteredUsers.size(), 0);
+	}
+	
+	@Test
+	public void filter_city_600_KM_boundary() throws Exception {
+	 List<UserDTO> filteredUsers =	userService.filterByDistance(dtoList,600,"KM");
+	 assertEquals(filteredUsers.size(), 4);
+	 assertEquals(filteredUsers.get(2).getFirst_name(),"Ganesh");
+	}
+	
+	
+	@Test
+	public void should_return_london_city_users() throws Exception {
+		List<UserDTO> filteredUsers = userService.getUserByCity(cityName);
+		assertThat(filteredUsers.size(), greaterThan(0));
+	}
+	
+	@Test
+	public void should_throw_invalid_city_exception() throws Exception {
+		Assertions.assertThrows(InvalidCityException.class, ()->userService.getUserByCity(""));
 	}
 
+	@Test
+	public void should_throw_user_not_cound_exception() throws Exception {
+		Assertions.assertThrows(FeignException.NotFound.class, ()->userService.getUserById("1a"));
+	}
+
+	
 	@Test
 	public void getUserById() throws Exception {
-
-		when(userService.getUserById("1")).thenReturn(dtoList.get(0));
-		mockmvc.perform(get(createURLWithPort("/users/1")).header(HttpHeaders.AUTHORIZATION, getAuthHeader())
-				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andExpect(jsonPath("$.id", is(1)))
-				.andExpect(jsonPath("$.first_name", is("Babu")));
-	}
-
-	@Test
-	public void UserNotFound() throws Exception {
-		when(userService.getUserById("111111111231231231")).thenThrow(UserNotFoundException.class);
-		mockmvc.perform(get(createURLWithPort("/users/111111111231231231"))
-				.header(HttpHeaders.AUTHORIZATION, getAuthHeader())
-				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-				.andDo(print()).andExpect(status().isNotFound());
-
-	}
-
-	@Test
-	public void getUserByCity() throws Exception {
-		when(userService.getUserByCity("London")).thenReturn(dtoList);
-		mockmvc.perform(get(createURLWithPort("/city/London/users")).header(HttpHeaders.AUTHORIZATION, getAuthHeader())
-				.accept(MediaType.APPLICATION_JSON)).andDo(print())
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
-	}
-
-	@Test
-	public void wrongCity() throws Exception {
-		when(userService.getUserByCity("Lon123")).thenThrow(InvalidCityException.class);
-		mockmvc.perform(get(createURLWithPort("/city/Lon123/users")).header(HttpHeaders.AUTHORIZATION, getAuthHeader())
-				.accept(MediaType.APPLICATION_JSON)).andDo(print())
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON)).andExpect(status().is4xxClientError());
-
-	}
-
-	@Test
-	public void getUsersInCityWithIn_50_Mile_Default_units() throws Exception {
-		when(userService.getUserByCity("London")).thenReturn(dtoList);
-		mockmvc.perform(get(createURLWithPort("/city/London/users?distance=50"))
-				.header(HttpHeaders.AUTHORIZATION, getAuthHeader()).accept(MediaType.APPLICATION_JSON)).andDo(print())
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
-
+		UserDTO user = userService.getUserById("1");
+		assertThat(user, notNullValue());
 	}
 	
-	@Test
-	public void getUsersInCityWithIn_100_KM_Units() throws Exception {
-		when(userService.getUserByCity("London")).thenReturn(dtoList);
-		mockmvc.perform(get(createURLWithPort("/city/London/users?distance=100&units=Km"))
-				.header(HttpHeaders.AUTHORIZATION, getAuthHeader()).accept(MediaType.APPLICATION_JSON)).andDo(print())
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
-
-	}
-
-	private String createURLWithPort(String uri) {
-		return "http://localhost:" + port + "/api/v1" + uri;
-	}
-
-	private String getAuthHeader() {
-		return "Basic " + Base64Utils.encodeToString((username + ":" + password).getBytes());
-	}
-
+	
+	
 }
