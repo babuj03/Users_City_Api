@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,11 +51,12 @@ public class UserTest {
 	
 	@BeforeAll
 	public static void init() {
+		
 		dtoList = new ArrayList<UserDTO>();
-		dtoList.add(UserDTO.builder().first_name("Babu").last_name("").email("bab@tes.com").id(1l).latitude(51.507351).longitude(0.118092).build());
-		dtoList.add(UserDTO.builder().first_name("Jay").last_name("").email("jay@tes.com").id(2l).latitude(51.5033).longitude(0.1195).build());
-		dtoList.add(UserDTO.builder().first_name("Ganesh").last_name("").email("ganesh@tes.com").id(3l).latitude(53.507351).longitude(1.5491).build());
-		dtoList.add(UserDTO.builder().first_name("Tej").last_name("").email("Tej@tes.com").id(4l).latitude(54.9783).longitude(1.6178).build());
+		dtoList.add(UserDTO.builder().first_name("Babu").last_name("").email("bab@tes.com").id(1l).latitude(51.507351).longitude(0.118092).ip_address("").createdBy("").createdDate(LocalDate.now()).build());
+		dtoList.add(UserDTO.builder().first_name("Jay").last_name("").email("jay@tes.com").id(2l).latitude(51.5033).longitude(0.1195).ip_address("").createdBy("").createdDate(LocalDate.now()).build());
+		dtoList.add(UserDTO.builder().first_name("Ganesh").last_name("").email("ganesh@tes.com").id(3l).latitude(53.507351).longitude(1.5491).ip_address("").createdBy("").createdDate(LocalDate.now()).build());
+		dtoList.add(UserDTO.builder().first_name("Tej").last_name("").email("Tej@tes.com").id(4l).latitude(54.9783).longitude(1.6178).ip_address("").createdBy("").createdDate(LocalDate.now()).build());
 		
 	}
 	
@@ -81,59 +83,59 @@ public class UserTest {
 	public  void invalid_city_name() {
 	  assertEquals(false,ServiceUtil.isStringOnlyAlphabet("3LOS"));
 	}
-	
+		
 	@Test
 	public void capitalize_City_Name() {
 		assertEquals("Leeds",ServiceUtil.capitalize("LEEDS"));
 	}
 	
 	@Test
-	public void filter_city_within_50_KM() throws Exception {
-	 List<UserDTO> filteredUsers =	userService.filterByDistance(dtoList,50,"KM");
+	public void filter_city_within_50_KM()  {
+	 List<UserDTO> filteredUsers =	userService.filterByDistance(dtoList,50.0f,"KM");
 	 assertEquals(filteredUsers.size(), 2);
 	 assertEquals(filteredUsers.get(0).getFirst_name(),"Babu");
 	}
 	
 	@Test
-	public void filter_city_within_50_Miles() throws Exception {
-	 List<UserDTO> filteredUsers =	userService.filterByDistance(dtoList,50,"Miles");
+	public void filter_city_within_50_Miles()  {
+	 List<UserDTO> filteredUsers =	userService.filterByDistance(dtoList,50.0f,"Miles");
 	 assertEquals(filteredUsers.size(), 2);
 	 assertEquals(filteredUsers.get(0).getFirst_name(),"Babu");
 	}
 	
 	@Test
-	public void filter_city_within_50_Meter() throws Exception {
-	 List<UserDTO> filteredUsers =	userService.filterByDistance(dtoList,50,"Meter");
+	public void filter_city_within_50_Meter()  {
+	 List<UserDTO> filteredUsers =	userService.filterByDistance(dtoList,50.0f,"Meter");
 	 assertEquals(filteredUsers.size(), 0);
 	}
 	
 	@Test
-	public void filter_city_600_KM_boundary() throws Exception {
-	 List<UserDTO> filteredUsers =	userService.filterByDistance(dtoList,600,"KM");
+	public void filter_city_600_KM_boundary()  {
+	 List<UserDTO> filteredUsers =	userService.filterByDistance(dtoList,500f,"KM");
 	 assertEquals(filteredUsers.size(), 4);
 	 assertEquals(filteredUsers.get(2).getFirst_name(),"Ganesh");
 	}
 	
 	
 	@Test
-	public void should_return_london_city_users() throws Exception {
+	public void should_return_london_city_users()  {
 		List<UserDTO> filteredUsers = userService.getUserByCity(cityName);
 		assertThat(filteredUsers.size(), greaterThan(0));
 	}
 	
 	@Test
-	public void should_throw_invalid_city_exception() throws Exception {
+	public void should_throw_invalid_city_exception()  {
 		Assertions.assertThrows(InvalidCityException.class, ()->userService.getUserByCity(""));
 	}
 
 	@Test
-	public void should_throw_user_not_cound_exception() throws Exception {
+	public void should_throw_user_not_cound_exception()  {
 		Assertions.assertThrows(FeignException.NotFound.class, ()->userService.getUserById("1a"));
 	}
 
 	
 	@Test
-	public void getUserById() throws Exception {
+	public void getUserById()  {
 		UserDTO user = userService.getUserById("1");
 		assertThat(user, notNullValue());
 	}
