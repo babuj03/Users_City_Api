@@ -41,7 +41,7 @@ public class UserService {
 		return userServiceProxy.getUsers();
 	}
 
-	public UserDTO getUserById(String id) throws FeignClientException {
+	public UserDTO getUserById(String id) throws Exception {
 		return userServiceProxy.getUserById(id);
 		
 	}
